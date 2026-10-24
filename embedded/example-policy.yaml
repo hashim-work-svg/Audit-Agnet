@@ -1,0 +1,97 @@
+version: "1.0"
+agents:
+  analytics-agent:
+    description: "Business analytics agent with strict PII masking"
+    allowed_tables:
+      - customers
+      - products
+      - orders
+      - order_items
+    allowed_columns:
+      customers:
+        - id
+        - full_name
+        - email
+        - phone
+        - address
+        - credit_card_last4
+        - created_at
+        # Note: ssn_last4 is explicitly restricted/omitted
+      products:
+        - id
+        - sku
+        - name
+        - category
+        - price_cents
+        - stock_quantity
+        - created_at
+      orders:
+        - id
+        - customer_id
+        - order_status
+        - total_cents
+        - shipping_address
+        - created_at
+      order_items:
+        - id
+        - order_id
+        - product_id
+        - quantity
+        - unit_price_cents
+    masked_columns:
+      customers:
+        email: "partial"          # a***e@example.corp
+        phone: "redact"           # [REDACTED_PHONE]
+        credit_card_last4: "hash" # SHA-256 hash
+      orders:
+        shipping_address: "partial" # 101 C***
+    limits:
+      max_rows_per_query: 50
+      max_queries_per_minute: 60
+      max_result_bytes: 1048576   # 1 MB
+    pii_auto_detect: true
+
+  support-agent:
+    description: "Support tier 1 agent with limited table access"
+    allowed_tables:
+      - customers
+      - orders
+    allowed_columns:
+      customers:
+        - id
+        - full_name
+        - email
+        - phone
+        - created_at
+      orders:
+        - id
+        - customer_id
+        - order_status
+        - total_cents
+        - created_at
+    masked_columns:
+      customers:
+        phone: "partial"
+    limits:
+      max_rows_per_query: 25
+      max_queries_per_minute: 30
+      max_result_bytes: 524288    # 512 KB
+    pii_auto_detect: true
+
+  restricted-agent:
+    description: "High-security agent restricted only to product catalog"
+    allowed_tables:
+      - products
+    allowed_columns:
+      products:
+        - id
+        - sku
+        - name
+        - category
+        - price_cents
+    masked_columns: {}
+    limits:
+      max_rows_per_query: 10
+      max_queries_per_minute: 10
+      max_result_bytes: 65536     # 64 KB
+    pii_auto_detect: false

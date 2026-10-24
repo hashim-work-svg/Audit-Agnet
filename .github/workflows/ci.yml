@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-test:
+    name: Lint, Static Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: true
+
+      - name: Verify Dependencies
+        run: |
+          go mod verify
+
+      - name: Run Go Vet
+        run: |
+          go vet ./...
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.60.3
+          args: --timeout=5m
+
+      - name: Run Tests with Race Detector
+        run: |
+          go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
+
+      - name: Test Coverage Check
+        run: |
+          go tool cover -func=coverage.out
+
+      - name: Static Binary Build (CGO_ENABLED=0)
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o dist/mcp-guard-linux-amd64 ./cmd/mcp-guard
+          chmod +x dist/mcp-guard-linux-amd64
+
+      - name: Verify Linux Static Linking
+        run: |
+          file dist/mcp-guard-linux-amd64 | grep "statically linked"
+          dist/mcp-guard-linux-amd64 version
+
+      - name: Run Go Vulnerability Check
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
+
+  mysql-integration:
+    name: MySQL 8 Integration Tests
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: RootSecret2026!
+          MYSQL_DATABASE: mcp_guard_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+
+      - name: Seed MySQL Test Database
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -u root -pRootSecret2026! mcp_guard_test < scripts/mysql_init.sql
+
+      - name: Run MySQL Integration Tests
+        env:
+          MYSQL_TEST_DSN: "mcp_readonly:ReadOnlySecretPass2026!@tcp(127.0.0.1:3306)/mcp_guard_test"
+          RUN_MYSQL_INTEGRATION: "true"
+        run: |
+          go test -v ./...
