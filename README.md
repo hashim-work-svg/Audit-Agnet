@@ -1,8 +1,8 @@
 # MCP-Guard 🛡️
 
-[![CI](https://github.com/muhammad-hashim/mcp-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/muhammad-hashim/mcp-guard/actions)
+[![CI](https://github.com/hashim-work-svg/Audit-Agnet/actions/workflows/ci.yml/badge.svg)](https://github.com/hashim-work-svg/Audit-Agnet/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Go Report Card](https://goreportcard.com/badge/github.com/muhammad-hashim/mcp-guard)](https://goreportcard.com/report/github.com/muhammad-hashim/mcp-guard)
+[![Go Report Card](https://goreportcard.com/badge/github.com/hashim-work-svg/Audit-Agnet)](https://goreportcard.com/report/github.com/hashim-work-svg/Audit-Agnet)
 [![Static Binary](https://img.shields.io/badge/Binary-Static%20CGO_ENABLED%3D0-brightgreen.svg)](#installation)
 
 > **Zero-Trust, Policy-Controlled, Audited MCP Database Gateway for AI Agents.**
@@ -78,8 +78,8 @@ Experience `mcp-guard` immediately with embedded synthetic e-commerce data:
 
 ```bash
 # Clone the repository
-git clone https://github.com/muhammad-hashim/mcp-guard.git
-cd mcp-guard
+git clone https://github.com/hashim-work-svg/Audit-Agnet.git
+cd Audit-Agnet
 
 # Run the zero-install demo (uses pure-Go embedded SQLite and synthetic data)
 go run ./cmd/mcp-guard demo
