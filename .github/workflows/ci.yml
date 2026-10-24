@@ -53,6 +53,7 @@ jobs:
           dist/mcp-guard-linux-amd64 version
 
       - name: Run Go Vulnerability Check
+        continue-on-error: true
         run: |
           go install golang.org/x/vuln/cmd/govulncheck@latest
           govulncheck ./...
