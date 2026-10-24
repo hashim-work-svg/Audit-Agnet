@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/muhammad-hashim/mcp-guard/embedded"
-	"github.com/muhammad-hashim/mcp-guard/internal/db"
+	"github.com/hashim-work-svg/Audit-Agnet/embedded"
+	"github.com/hashim-work-svg/Audit-Agnet/internal/db"
 )
 
 // InitDemoDB initializes an in-memory SQLite database populated with embedded schema and synthetic seed data.

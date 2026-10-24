@@ -21,73 +21,56 @@ The **Model Context Protocol (MCP)** enables autonomous AI agents and Large Lang
 
 ---
 
-## 2. Key Capabilities
+## 2. Implementation Status
 
-* 🔒 **Granular Least Privilege:** YAML policies restrict each agent to specific tables, explicit column lists, and query row limits.
-* 🛡️ **AST-Based SQL Validation:** Powered by Vitess AST parsing. Rejects multi-statements, non-`SELECT` operations, subqueries on forbidden tables, and dangerous database routines (`SLEEP`, `BENCHMARK`, `LOAD_FILE`, `INTO OUTFILE`).
-* 🎭 **Automated PII Masking:** Dynamic field-level masking (hash, redact, partial mask) plus pattern detection for emails, phone numbers, and payment tokens.
-* ⛓️ **Tamper-Evident Hash-Chain Audit Log:** Every query decision is cryptographically chained using SHA-256 digests. Any post-hoc modification or row deletion is immediately flagged by `verify-audit`.
-* ⚡ **Single Static Binary (`CGO_ENABLED=0`):** Pure-Go dependencies with zero external dynamic C library requirements. Shipped for Linux, macOS, and Windows.
-* 🚀 **Zero-Install Demo:** Run `mcp-guard demo` to immediately test with embedded synthetic data—no MySQL or Docker required.
+| Feature | Status | Description |
+| :--- | :---: | :--- |
+| **AST SQL Validation** | ✅ Shipped | Strict AST parsing rejecting non-SELECT, stacking, DDL/DML, dangerous routines |
+| **Policy Engine** | ✅ Shipped | Table/column allowlists, row limits, result byte caps per agent |
+| **PII Masking Engine** | ✅ Shipped | Redaction, partial masking, HMAC-SHA256 hashing, regex pattern auto-detection |
+| **Bearer Token Authentication** | ✅ Shipped | SHA-256 token verification and revocation check |
+| **Per-Agent Rate Limiting** | ✅ Shipped | Sliding-window query limits per minute |
+| **Tool-Definition Pinning** | ✅ Shipped | Cryptographic hashes computed at startup to prevent schema tampering |
+| **Hash-Chained Audit Log** | ✅ Shipped | Unbroken HMAC-SHA256 chain over all record fields with `verify-audit` CLI |
+| **Zero-Install Demo Mode** | ✅ Shipped | `mcp-guard demo` runs with embedded pure-Go SQLite |
 
 ---
 
-## 3. Architecture Overview
+## 3. Installation
 
+Download pre-compiled static binaries from [GitHub Releases](https://github.com/hashim-work-svg/Audit-Agnet/releases), or install via Go:
+
+```bash
+go install github.com/hashim-work-svg/Audit-Agnet/cmd/mcp-guard@latest
 ```
-[AI Agent / LLM Client]
-          │  MCP JSON-RPC (Bearer Token)
-          ▼
-   ┌───────────────┐
-   │ Authentication│ ───► Token SHA-256 Verification & Revocation Check
-   └───────┬───────┘
-           ▼
-   ┌───────────────┐
-   │  Rate Limiter │ ───► Token Bucket (Queries/min & Bandwidth Limits)
-   └───────┬───────┘
-           ▼
-   ┌───────────────┐
-   │ AST Validator │ ───► Vitess AST Parser (Single SELECT only, No Stacking)
-   └───────┬───────┘
-           ▼
-   ┌───────────────┐
-   │ Policy Engine │ ───► Table/Column Whitelisting & Auto LIMIT Injection
-   └───────┬───────┘
-           ▼
-   ┌───────────────┐
-   │ Execution DB  │ ───► Read-Only Execution (MySQL 8 / Embedded SQLite)
-   └───────┬───────┘
-           ▼
-   ┌───────────────┐
-   │  PII Masking  │ ───► Partial Masking, Redaction & Regex Scanning
-   └───────┬───────┘
-           ▼
-   ┌───────────────┐
-   │ Hash-Chained  │ ───► Append-Only SHA-256 Tamper-Evident Audit Record
-   │   Audit Log   │
-   └───────┬───────┘
-           ▼
-[Sanitized MCP Result]
+
+Or build from source:
+
+```bash
+git clone https://github.com/hashim-work-svg/Audit-Agnet.git
+cd Audit-Agnet
+make build-static
 ```
 
 ---
 
-## 4. Quickstart: Zero-Install Demo
+## 4. Quickstart
 
+### Zero-Install Interactive Demonstration:
 Experience `mcp-guard` immediately with embedded synthetic e-commerce data:
 
 ```bash
-# Clone the repository
-git clone https://github.com/hashim-work-svg/Audit-Agnet.git
-cd Audit-Agnet
-
-# Run the zero-install demo (uses pure-Go embedded SQLite and synthetic data)
-go run ./cmd/mcp-guard demo
+./bin/mcp-guard demo
 ```
 
-You can inspect the binary version and build metadata:
+### Verify Audit Log Cryptographic Integrity:
 ```bash
-go run ./cmd/mcp-guard version
+./bin/mcp-guard verify-audit
+```
+
+### Generate Token Hash for Agent Key Provisioning:
+```bash
+./bin/mcp-guard hash-token my-secret-agent-token
 ```
 
 ---

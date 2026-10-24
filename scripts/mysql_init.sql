@@ -93,6 +93,8 @@ INSERT INTO products (id, sku, name, category, price_cents, stock_quantity, crea
 ON DUPLICATE KEY UPDATE name=VALUES(name);
 
 INSERT INTO agent_keys (agent_id, token_hash, description, created_at, revoked) VALUES
-('analytics-agent', '8d39e31d4b684cbfe36fe05c74f51e0640df11cc714d2a138c227dbd76378e9b', 'Read-only business analytics agent with PII masking', '2026-01-01 00:00:00', 0),
-('support-agent', 'd5b4a53075b6e082159846b08051759d57a957a66164ea5a39cb68bcf82e817a', 'Customer support tier 1 agent with customer email unmasked', '2026-01-01 00:00:00', 0)
+('analytics-agent', 'abe45dda0e4814a9f423e743a1ea2737358dca2a0e9dde84c725b0c81466667c', 'Read-only analytics agent with PII masking', '2026-01-01 00:00:00', 0),
+('support-agent', 'ea6675ffc82c9a534c69810570f52f3f55402e7dce64da367dbf5fb55be45009', 'Customer support tier 1 agent', '2026-01-01 00:00:00', 0),
+('restricted-agent', 'f107c6d6c044b2ec0e279b14a0dd59e425238ddeb3b0fdaceea363816edc7a97', 'Restricted catalog agent', '2026-01-01 00:00:00', 0),
+('revoked-agent', '970ba8b48254f95fb325cac3ea83db3e2bbdbbc2253eae58590dcd3f8c9074b5', 'Decommissioned test agent', '2026-01-01 00:00:00', 1)
 ON DUPLICATE KEY UPDATE description=VALUES(description);

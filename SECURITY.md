@@ -30,4 +30,4 @@
 
 ## Reporting a Security Vulnerability
 
-If you discover a security vulnerability within `mcp-guard`, please do not open a public issue. Email the project maintainer at `security@example.corp` or open a private GitHub Security Advisory.
+If you discover a security vulnerability within `mcp-guard`, please open a private [GitHub Security Advisory](https://github.com/hashim-work-svg/Audit-Agnet/security/advisories/new). Do not report security vulnerabilities via public GitHub issues.
